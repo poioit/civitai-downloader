@@ -31,4 +31,4 @@ if ! curl -LOJH "${API_TOKEN}" "https://civitai.com/api/download/models/"${respo
 fi
 
 echo "Model downloaded successfully!"
-# curl -L -H "Content-Type: application/json" -H "Authorization: Bearer ${API_KEY}" https://civitai.com/api/download/models/128078 -o aetherver
+# curl -L -H "Content-Type: application/json" -H "Authorization: Bearer cb21cf3f57378b8830d5045d1d567edc" https://civitai.com/api/download/models/128078 -o aetherver
