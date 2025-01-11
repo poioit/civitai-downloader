@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+source .env
+
 if [ "$#" -ne 2 ]; then
   echo "Usage: $0 <URL> <DESTINATION>"
   echo "   eg: $0 352581 ./output"
@@ -21,14 +23,24 @@ echo "Downloading model from ${URL}, please wait..."
 cd ${DESTINATION}
 
 
-response=$(curl https://civitai.com/api/v1/models/${URL} -H "Content-Type: application/json" -X GET | jq '.modelVersions[0].id')
+response=$(curl https://civitai.com/api/v1/models/${URL} -H "Content-Type: application/json" -X GET)
 
-echo "download from model number: ${response}"
+echo "$response" | jq -c '.modelVersions[] | {files: [.files[].name], downloadUrl}' | while read -r item; do
+  name=$(echo "$item" | jq -r '.files[0]')
+  url=$(echo "$item" | jq -r '.downloadUrl')
 
-if ! curl -LOJH "${API_TOKEN}" "https://civitai.com/api/download/models/"${response}; then
-  echo "ERROR: curl command failed. Unable to download the file."
-  exit 1
-fi
+  echo "Processing ID: $name, URL: $url"
+  #curl -O "$url"
+  echo "download from model number: ${url}"
+  echo "api ${API_KEY}"
+  #curl -L -H "Content-Type: application/json" -H "Authorization: Bearer ${API_KEY}" "$url" -o "$name"
+  if ! curl -L -H "Content-Type: application/json" -H "Authorization: Bearer ${API_KEY}" "$url" -o "$name"; then
+    echo "ERROR: curl command failed. Unable to download the file."
+    exit 1
+  fi
+
+
+done
 
 echo "Model downloaded successfully!"
 # curl -L -H "Content-Type: application/json" -H "Authorization: Bearer ${API_KEY}" https://civitai.com/api/download/models/128078 -o aetherver
